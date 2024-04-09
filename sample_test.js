@@ -19,6 +19,7 @@ const tokens = [
     // {"type" : type.STRING, "value" : "comment"},
     // {"type" : type.STRING, "value" : "*/"}, 
 
+    //TERMITE.LOG
     //Separate indiv methods based on ( )... not sure if in "" or not
     {"type" : type.METHOD, "value" : termite.log},
     {"type" : type.DELIMITER, "value" : "("},
@@ -26,4 +27,6 @@ const tokens = [
     {"type" : type.STRING, "value" : "world!"},
     {"type" : type.DELIMITER, "value" : ")"},
     {"type" : type.TERMINATOR, "value" : "|"}
+
+    //#PROJECT
 ]
