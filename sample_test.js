@@ -3,20 +3,20 @@
 
 const tokens = [
     //COMMENTS
-    {"type" : type.STRING, "value" : "//"},
+    {"type" : type.STRING, "value" : "**"},
     {"type" : type.STRING, "value" : "This"},
     {"type" : type.STRING, "value" : "is"},
     {"type" : type.STRING, "value" : "a"},
     {"type" : type.STRING, "value" : "single"},
     {"type" : type.STRING, "value" : "comment"},
-    {"type" : type.STRING, "value" : "/*"},
+    {"type" : type.STRING, "value" : "*/"},
     {"type" : type.STRING, "value" : "This"},
     {"type" : type.STRING, "value" : "is"},
     {"type" : type.STRING, "value" : "a"},
     {"type" : type.STRING, "value" : "multi"},
     {"type" : type.STRING, "value" : "line"},
     {"type" : type.STRING, "value" : "comment"},
-    {"type" : type.STRING, "value" : "*/"}, 
+    {"type" : type.STRING, "value" : "/*"}, 
 
     //TERMITE.LOG
     //Separate indiv methods based on ( )... not sure if in "" or not
