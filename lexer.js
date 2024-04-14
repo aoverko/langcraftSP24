@@ -18,13 +18,16 @@ rl.question("Enter your filepath: ", (filePath) => {
   rl.close(); //close terminal to prevent further input
   fs.readFile(filePath, (err, data) => {
     if (err) {
+      console.log(err);
       return;
     } else {
-      fileData = data;
-      console.log(fileData);
+      lexer(data);
     }
   });
 });
 
 
-//lexer logic (do later)
+//Lexer logic
+function lexer(fileData){
+
+};
