@@ -15,13 +15,13 @@ const rl = readline.createInterface({
 
 //Get file data from user
 rl.question("Enter your filepath: ", (filePath) => {
-  rl.close();
+  rl.close(); //close terminal to prevent further input
   fs.readFile(filePath, (err, data) => {
     if (err) {
       return;
     } else {
       fileData = data;
-      console.log(data);
+      console.log(fileData);
     }
   });
 });
