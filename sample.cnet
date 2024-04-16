@@ -1,8 +1,8 @@
-// This is a single comment
+** This is a single comment
 
-/* This is
+*/ This is
    a multi line
-   comment */
+   comment /*
 
 termite.log("Hello, world!")|
 
