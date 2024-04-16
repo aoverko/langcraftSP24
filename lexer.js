@@ -29,5 +29,5 @@ rl.question("Enter your filepath: ", (filePath) => {
 
 //Lexer logic
 function lexer(fileData){
-
+  console.log("hello");
 };
