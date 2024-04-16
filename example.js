@@ -1,3 +1,11 @@
+const fs = require("fs");
+const readline = require("readline");
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
 console.log("My new PUDDLE language.");
 
 class Type {
@@ -10,7 +18,7 @@ class Type {
 
 class Lexer {
     constructor(input) {
-        this.i = input.split(/\s+/);
+        this.i = input.toString().split(/\s+/);
         this.out = [];
     }
 
@@ -70,18 +78,6 @@ class Parser {
     }
 }
 
-function prettyPrintAST(ast, indent = 0) {
-    if (ast.Type === 'Literal') {
-        console.log(' '.repeat(indent) + `Literal(${ast.value})`);
-    } else if (ast.Type === 'BinaryOperation') {
-        console.log(' '.repeat(indent) + `BinaryOperation(${ast.operator})`);
-        console.log(' '.repeat(indent) + '├─ left:');
-        prettyPrintAST(ast.left, indent + 4);
-        console.log(' '.repeat(indent) + '└─ right:');
-        prettyPrintAST(ast.right, indent + 4);
-    }
-}
-
 class Interpreter {
     evaluateAST(ast) {
         if (ast.Type === 'Literal') {
@@ -106,18 +102,21 @@ class Interpreter {
     }
 }
 
-const input = "2 + + + 4 + 6 + 8 + 1000";
-console.log("\n--------INPUT--------");
-console.log(input);
+rl.question("Enter your filepath: ", (filePath) => {
+  rl.close(); //close terminal to prevent further input
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading file:", err);
+      return;
+    }
+    const lexerInstance = new Lexer(data);
+    const tokens = lexerInstance.lex();
+    const parserInstance = new Parser(tokens);
+    const ast = parserInstance.parse();
+    const interpreter = new Interpreter();
+    const result = interpreter.evaluateAST(ast);
 
-const tokens = new Lexer(input).lex();
-console.log("\n--------TOKENS--------");
-console.log(tokens);
-
-const ast = new Parser(tokens).parse();
-console.log("\n--------AST--------");
-console.log(ast);
-
-const result = new Interpreter().evaluateAST(ast);
-console.log("\n--------RESULT--------");
-console.log(`The result of your line of code is: ${result}\n`);
+    console.log("\n--------RESULT--------");
+    console.log(`The result of your line of code is: ${result}\n`);
+  });
+});
