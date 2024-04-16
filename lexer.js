@@ -16,7 +16,7 @@ const rl = readline.createInterface({
 //Get file data from user
 rl.question("Enter your filepath: ", (filePath) => {
   rl.close(); //close terminal to prevent further input
-  fs.readFile(filePath, (err, data) => {
+  fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
       console.log(err);
       return;
