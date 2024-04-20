@@ -19,14 +19,16 @@ rl.question("Enter your file name: ", (fileName) => {
     if (err) {
       console.log(err);
       return;
-    } else {
-      lexer(data);
     }
+    const lexerInstance = new Lexer(data);
+    const tokens = lexerInstance.lex();
+    console.log(tokens);
   });
 });
 
 //Lexer logic
 //included types we might not use just so the blueprint is there
+//basically the same effect as enums in the Type class w| static
 class Type {
   static STRING = "STRING";
   static NUMBER = "NUMBER";
@@ -42,6 +44,76 @@ class Type {
   static TERMINATOR = "TERMINATOR";
 }
 
-function lexer(fileData) {
-  console.log("hello");
+class Lexer {
+  constructor(input) {
+    this.in = input.toString().split(/\s+/);
+    this.out = [];
+  }
+
+  lex() {
+    //regex to scan for and tokenize. Can include more groups for methods/keywords as lang grows
+    //still need to add cases for arrays, logical ops, and bools
+    const add = /^\+$/;
+    const sub = /^\-$/;
+    const div = /^\\$/;
+    const mult = /^\*$/;
+    const eq = /^\=$/;
+    const digit = /^\d+$/;
+    const char = /[a-zA-Z]/;
+    const variable = /^set$/;
+    const func_dec = /^def$/;
+    const methods = /^(termite.log)$/;
+    const m_comment = /(?:\\*\/[a-zA-z]\/\*)/;
+    const s_comment = /^(?:\/\/[a-zA-Z])$/;
+    const par = /^\(|\)$/;
+    const block = /^(?::\|)|(?:\|:)$/;
+    const term = /^\|$/;
+    const comma = /^\,$/;
+
+    //categorize tokens
+    this.in.forEach((token) => {
+      if (add.test(token) || sub.test(token) || div.test(token) || mult.test(token)) {
+        this.out.push({ Type: Type.OPERATOR, value: token });
+      }
+      if (eq.test(token)) {
+        this.out.push({ Type: Type.EQUALS, value: token });
+      }
+      if (digit.test(token)) {
+        this.out.push({ Type: Type.NUMBER, value: token });
+      }
+      if (char.test(token) && token.includes("(" || ")")) {
+        let guts = token.split(par);
+        guts.forEach((part) => {
+          if (part.includes(",")) {
+            let params = part.split(",");
+            params.forEach((param) => {
+              this.out.push({ Type: Type.PARAMETER, value: param });
+            });
+          }
+        });
+      }
+      if (variable.test(token)) {
+        this.out.push({Type: Type.VARIABLE, value: token});
+      }
+      if (func_dec.test(token)) {
+        this.out.push({Type: Type.FUNCTION, value: token});
+      }
+      if (methods.test(token)) {
+        this.out.push({Type: Type.METHOD, value: token});
+      }
+      if (par.test(token)) { //may need to adjust so it prints (), and for the rest below...
+        this.out.push({Type: Type.DELIMITER, value: token});
+      }
+      if (comma.test(token)) {
+        this.out.push({Type: Type.DELIMITER, value: token});
+      }
+      if (block.test(token)) {
+        this.out.push({Type: Type.DELIMITER, value: token});
+      }
+      if (term.test(token)) {
+        this.out.push({Type: Type.TERMINATOR, value: token});
+      }
+    });
+    console.log(this.out);
+  } 
 }
