@@ -22,7 +22,6 @@ rl.question("Enter your file name: ", (fileName) => {
     }
     const lexerInstance = new Lexer(data);
     const tokens = lexerInstance.lex();
-    console.log(tokens);
   });
 });
 
@@ -55,15 +54,14 @@ class Lexer {
     //still need to add cases for arrays, logical ops, and bools
     const add = /^\+$/;
     const sub = /^\-$/;
-    const div = /^\\$/;
+    const div = /^\/$/;
     const mult = /^\*$/;
     const eq = /^\=$/;
     const digit = /^\d+$/;
-    const char = /[a-zA-Z]/;
     const variable = /^set$/;
     const func_dec = /^def$/;
-    const methods = /^(termite.log)$/;
-    const ident = /^(?:\#[a-zA-z])/;
+    const methods = /^(?:termite.log)$/;
+    const ident = /^(?:\#\w+)/;
     const par = /^\(|\)$/;
     const block = /^(?::\|)|(?:\|:)$/;
     const term = /^\|$/;
@@ -81,15 +79,13 @@ class Lexer {
         this.out.push({ Type: Type.NUMBER, value: token });
       }
       // bug haven
-      if (char.test(token) && token.includes("(" || ")")) {
-        let guts = token.split(par);
+      if (ident.test(token) && par.test(token)) {
+        let guts = token.split("(" || ")");
         guts.forEach((part) => {
-          if (part.includes(",")) {
             let params = part.split(",");
             params.forEach((param) => {
               this.out.push({ Type: Type.PARAMETER, value: param });
             });
-          }
         });
       }
       if (variable.test(token)) {
