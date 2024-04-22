@@ -61,15 +61,20 @@ class Lexer {
     const variable = /^set$/;
     const func_dec = /^def$/;
     const methods = /^(?:termite.log)$/;
-    const ident = /^(?:\#\w+)/;
-    const par = /^\(|\)$/;
+    const ident = /^(?:\#\w+)$/;
+    const par = /\(|\)/;
     const block = /^(?::\|)|(?:\|:)$/;
     const term = /^\|$/;
     const comma = /\,/;
 
     //categorize tokens
     this.in.forEach((token) => {
-      if (add.test(token) || sub.test(token) || div.test(token) || mult.test(token)) {
+      if (
+        add.test(token) ||
+        sub.test(token) ||
+        div.test(token) ||
+        mult.test(token)
+      ) {
         this.out.push({ Type: Type.OPERATOR, value: token });
       }
       if (eq.test(token)) {
@@ -80,39 +85,41 @@ class Lexer {
       }
       // bug haven
       if (ident.test(token) && par.test(token)) {
-        let guts = token.split("(" || ")");
-        guts.forEach((part) => {
-            let params = part.split(",");
-            params.forEach((param) => {
-              this.out.push({ Type: Type.PARAMETER, value: param });
-            });
+        let guts = token.split(par);
+        this.out.push({Type: Type.IDENTIFIER, value: guts[0]});
+        guts.slice(1, guts.length - 1).forEach((part) => {
+          let params = part.split(",");
+          params.forEach((param) => {
+            this.out.push({ Type: Type.PARAMETER, value: param });
+          });
         });
       }
       if (variable.test(token)) {
-        this.out.push({Type: Type.VARIABLE, value: token});
+        this.out.push({ Type: Type.VARIABLE, value: token });
       }
       if (ident.test(token)) {
-        this.out.push({Type: Type.IDENTIFIER, value: token});
+        this.out.push({ Type: Type.IDENTIFIER, value: token });
       }
       if (func_dec.test(token)) {
-        this.out.push({Type: Type.FUNCTION, value: token});
+        this.out.push({ Type: Type.FUNCTION, value: token });
       }
       if (methods.test(token)) {
-        this.out.push({Type: Type.METHOD, value: token});
+        this.out.push({ Type: Type.METHOD, value: token });
       }
-      if (par.test(token)) { //may need to adjust so it prints (), and for the rest below...
-        this.out.push({Type: Type.DELIMITER, value: token});
+      if (par.test(token)) {
+        //may need to adjust so it prints (), and for the rest below...
+        this.out.push({ Type: Type.DELIMITER, value: token });
       }
       if (comma.test(token)) {
-        this.out.push({Type: Type.DELIMITER, value: token});
+        this.out.push({ Type: Type.DELIMITER, value: token });
       }
       if (block.test(token)) {
-        this.out.push({Type: Type.DELIMITER, value: token});
+        this.out.push({ Type: Type.DELIMITER, value: token });
       }
       if (term.test(token)) {
-        this.out.push({Type: Type.TERMINATOR, value: token});
+        this.out.push({ Type: Type.TERMINATOR, value: token });
       }
     });
     console.log(this.out);
-  } 
+  }
 }
