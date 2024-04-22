@@ -63,12 +63,11 @@ class Lexer {
     const variable = /^set$/;
     const func_dec = /^def$/;
     const methods = /^(termite.log)$/;
-    const m_comment = /(?:\\*\/[a-zA-z]\/\*)/;
-    const s_comment = /^(?:\/\/[a-zA-Z])$/;
+    const ident = /^(?:\#[a-zA-z])/;
     const par = /^\(|\)$/;
     const block = /^(?::\|)|(?:\|:)$/;
     const term = /^\|$/;
-    const comma = /^\,$/;
+    const comma = /\,/;
 
     //categorize tokens
     this.in.forEach((token) => {
@@ -81,6 +80,7 @@ class Lexer {
       if (digit.test(token)) {
         this.out.push({ Type: Type.NUMBER, value: token });
       }
+      // bug haven
       if (char.test(token) && token.includes("(" || ")")) {
         let guts = token.split(par);
         guts.forEach((part) => {
@@ -94,6 +94,9 @@ class Lexer {
       }
       if (variable.test(token)) {
         this.out.push({Type: Type.VARIABLE, value: token});
+      }
+      if (ident.test(token)) {
+        this.out.push({Type: Type.IDENTIFIER, value: token});
       }
       if (func_dec.test(token)) {
         this.out.push({Type: Type.FUNCTION, value: token});
