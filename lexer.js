@@ -58,13 +58,14 @@ class Lexer {
     const mult = /^\*$/;
     const eq = /^\=$/;
     const digit = /^\d+$/;
+    const char = /^[a-zA-z]$/;
     const variable = /^set$/;
     const func_dec = /^def$/;
     const methods = /^(?:termite.log)$/;
-    const ident = /^(?:\#\w+)$/;
+    const ident = /^(?:\#\w+)/;
     const par = /\(|\)/;
     const block = /^(?::\|)|(?:\|:)$/;
-    const term = /^\|$/;
+    const term = /\|$/;
     const comma = /\,/;
 
     //categorize tokens
@@ -83,7 +84,12 @@ class Lexer {
       if (digit.test(token)) {
         this.out.push({ Type: Type.NUMBER, value: token });
       }
+      if (char.test(token)) {
+        this.out.push({Token: Type.STRING, value: token});
+      }
       // bug haven
+      //known issue: testing for ident with only ^ works here and fails later when need ^$
+      //Bigger/similar issue with ( and )
       if (ident.test(token) && par.test(token)) {
         let guts = token.split(par);
         this.out.push({Type: Type.IDENTIFIER, value: guts[0]});
