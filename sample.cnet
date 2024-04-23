@@ -13,6 +13,6 @@ def #add(a,b) :|
 	Return a + b|
 |:
 
-set #result = #add(5, 3)|
+set #result = #add(5,3)|
 termite.log(#result)| 
 
