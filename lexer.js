@@ -1,7 +1,3 @@
-//useful Node.js links for ref:
-// readline: https://www.geeksforgeeks.org/node-js-readline-module/
-// readfile: https://stackoverflow.com/questions/10058814/get-data-from-fs-readfile
-
 //Import Libraries: File System and Readline (for user interaction)
 const fs = require("fs");
 const readline = require("readline");
@@ -62,11 +58,11 @@ class Lexer {
     const variable = /^set$/;
     const func_dec = /^def$/;
     const methods = /^(?:termite.log)$/;
-    const ident = /^(?:\#\w+)/;
-    const par = /\(|\)/;
+    const ident = /^(?:\#\w+)$/;
+    const par = /^(?::\()|(?:\):)$/;
     const block = /^(?::\|)|(?:\|:)$/;
-    const term = /\|$/;
-    const comma = /\,/;
+    const term = /^\|$/;
+    const comma = /^\,$/;
 
     //categorize tokens
     this.in.forEach((token) => {
@@ -78,21 +74,18 @@ class Lexer {
       ) {
         this.out.push({ Type: Type.OPERATOR, value: token });
       }
-      if (eq.test(token)) {
+      else if (eq.test(token)) {
         this.out.push({ Type: Type.EQUALS, value: token });
       }
-      if (digit.test(token)) {
+      else if (digit.test(token)) {
         this.out.push({ Type: Type.NUMBER, value: token });
       }
-      if (char.test(token)) {
-        this.out.push({Token: Type.STRING, value: token});
+      else if (char.test(token)) {
+        this.out.push({ Token: Type.STRING, value: token });
       }
-      // bug haven
-      //known issue: testing for ident with only ^ works here and fails later when need ^$
-      //Bigger/similar issue with ( and )
-      if (ident.test(token) && par.test(token)) {
-        let guts = token.split(par);
-        this.out.push({Type: Type.IDENTIFIER, value: guts[0]});
+      else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
+        let guts = token.split(/\(|\)/);
+        this.out.push({ Type: Type.IDENTIFIER, value: guts[0] });
         guts.slice(1, guts.length - 1).forEach((part) => {
           let params = part.split(",");
           params.forEach((param) => {
@@ -100,30 +93,37 @@ class Lexer {
           });
         });
       }
-      if (variable.test(token)) {
+      else if (variable.test(token)) {
         this.out.push({ Type: Type.VARIABLE, value: token });
       }
-      if (ident.test(token)) {
+      else if (ident.test(token)) {
         this.out.push({ Type: Type.IDENTIFIER, value: token });
       }
-      if (func_dec.test(token)) {
+      else if (func_dec.test(token)) {
         this.out.push({ Type: Type.FUNCTION, value: token });
       }
-      if (methods.test(token)) {
+      else if (methods.test(token)) {
         this.out.push({ Type: Type.METHOD, value: token });
       }
-      if (par.test(token)) {
-        //may need to adjust so it prints (), and for the rest below...
+      else if (par.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
       }
-      if (comma.test(token)) {
+      else if (comma.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
       }
-      if (block.test(token)) {
+      else if (block.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
       }
-      if (term.test(token)) {
+      else if (term.test(token)) {
         this.out.push({ Type: Type.TERMINATOR, value: token });
+      }//terminator subcases
+      else if (token.match(/^(?!.*:).*\|$/)) {
+        let end = token.substr(token.length - 1, 1);
+        this.out.push({ Type: Type.TERMINATOR, value: end });
+      }
+      else if (token.match(/[a-zA-Z]\|$/)) {//not finding matches (?)
+        let attached = token.substr(1, token.length-1);
+        this.out.push({ Type: Type.STRING, value: attached });
       }
     });
     console.log(this.out);
