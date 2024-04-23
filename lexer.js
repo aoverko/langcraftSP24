@@ -28,6 +28,7 @@ class Type {
   static STRING = "STRING";
   static NUMBER = "NUMBER";
   static IDENTIFIER = "IDENTIFIER";
+  static FUNC_NAME = "FUNC_NAME";
   static VARIABLE = "VARIABLE";
   static EQUALS = "EQUALS";
   static OPERATOR = "OPERATOR";
@@ -80,19 +81,19 @@ class Lexer {
       } else if (char.test(token)) {
         this.out.push({ Type: Type.STRING, value: token });
       //tokenize functions
-      } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
-          let l_par = token.match(/\(/); //not working, need something to tokenize (
-          l_par.substr(0, 1);
-          this.out.push({Type: Type.DELIMITER, value: l_par});
+      } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/) ) {
         let guts = token.split(/\(|\)/);
-        this.out.push({ Type: Type.IDENTIFIER, value: guts[0] });
+        let l_par = token.match(/\(/);
+        let r_par = token.match(/\)/);
+        this.out.push({ Type: Type.FUNC_NAME, value: guts[0] });
+        this.out.push({Type: Type.DELIMITER, value: l_par[0]});
         guts.slice(1, guts.length - 1).forEach((part) => {
           let params = part.split(",");
           params.forEach((param) => {
             this.out.push({ Type: Type.PARAMETER, value: param });
-        //need something to tokennize ) -- executes in order of matches usually
           });
         });
+        this.out.push({Type: Type.DELIMITER, value: r_par[r_par.length-1]});
       } else if (variable.test(token)) {
         this.out.push({ Type: Type.VARIABLE, value: token });
       } else if (ident.test(token)) {
@@ -108,7 +109,7 @@ class Lexer {
         this.out.push({ Type: Type.DELIMITER, value: token });
       } else if (block.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
-        //tokenize terminator (also cases for no space)
+        //tokenize terminator (also cases for no space and ending ')')
       } else if (term.test(token)) {
         this.out.push({ Type: Type.TERMINATOR, value: token });
       } else if (token.match(/[^0-9]\|$/)) {
@@ -121,8 +122,7 @@ class Lexer {
         this.out.push({ Type: Type.NUMBER, value: attached });
         let end = token.substr(token.length - 1, 1);
         this.out.push({ Type: Type.TERMINATOR, value: end });
-      }
-      //need parentheses subcase just like this when attached to other info
+      } 
     });
     console.log(this.out);
   }
