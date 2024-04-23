@@ -1,13 +1,12 @@
 ** This is a single comment
 
 */ This is
-   a multi line
+   a multi-line
    comment /*
 
 termite.log("Hello, world!")|
 
 set #project = "CodeNetLang"|
-
 
 
 def #add(a,b) :| 

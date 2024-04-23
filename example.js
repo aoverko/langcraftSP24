@@ -6,7 +6,7 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-console.log("My new PUDDLE language.");
+console.log("CodenetLang!");
 
 class Type {
     static IDENTIFIER = "IDENTIFIER";
