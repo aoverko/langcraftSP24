@@ -73,17 +73,13 @@ class Lexer {
         mult.test(token)
       ) {
         this.out.push({ Type: Type.OPERATOR, value: token });
-      }
-      else if (eq.test(token)) {
+      } else if (eq.test(token)) {
         this.out.push({ Type: Type.EQUALS, value: token });
-      }
-      else if (digit.test(token)) {
+      } else if (digit.test(token)) {
         this.out.push({ Type: Type.NUMBER, value: token });
-      }
-      else if (char.test(token)) {
+      } else if (char.test(token)) {
         this.out.push({ Token: Type.STRING, value: token });
-      }
-      else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
+      } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
         let guts = token.split(/\(|\)/);
         this.out.push({ Type: Type.IDENTIFIER, value: guts[0] });
         guts.slice(1, guts.length - 1).forEach((part) => {
@@ -92,38 +88,32 @@ class Lexer {
             this.out.push({ Type: Type.PARAMETER, value: param });
           });
         });
-      }
-      else if (variable.test(token)) {
+      } else if (variable.test(token)) {
         this.out.push({ Type: Type.VARIABLE, value: token });
-      }
-      else if (ident.test(token)) {
+      } else if (ident.test(token)) {
         this.out.push({ Type: Type.IDENTIFIER, value: token });
-      }
-      else if (func_dec.test(token)) {
+      } else if (func_dec.test(token)) {
         this.out.push({ Type: Type.FUNCTION, value: token });
-      }
-      else if (methods.test(token)) {
+      } else if (methods.test(token)) {
         this.out.push({ Type: Type.METHOD, value: token });
-      }
-      else if (par.test(token)) {
+      } else if (par.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
-      }
-      else if (comma.test(token)) {
+      } else if (comma.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
-      }
-      else if (block.test(token)) {
+      } else if (block.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
-      }
-      else if (term.test(token)) {
+      } else if (term.test(token)) {
         this.out.push({ Type: Type.TERMINATOR, value: token });
-      }//terminator subcases
-      else if (token.match(/^(?!.*:).*\|$/)) {
+      } else if (token.match(/[^0-9]\|$/)) {
+        let attached = token.substr(0, token.length - 1);
+        this.out.push({ Type: Type.STRING, value: attached });
         let end = token.substr(token.length - 1, 1);
         this.out.push({ Type: Type.TERMINATOR, value: end });
-      }
-      else if (token.match(/[a-zA-Z]\|$/)) {//not finding matches (?)
-        let attached = token.substr(1, token.length-1);
-        this.out.push({ Type: Type.STRING, value: attached });
+      } else if (token.match(/\d+\|$/)) {
+        let attached = token.substr(0, token.length - 1);
+        this.out.push({ Type: Type.NUMBER, value: attached });
+        let end = token.substr(token.length - 1, 1);
+        this.out.push({ Type: Type.TERMINATOR, value: end });
       }
     });
     console.log(this.out);
