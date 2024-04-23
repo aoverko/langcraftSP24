@@ -57,9 +57,9 @@ class Lexer {
     const char = /^[a-zA-z]$/;
     const variable = /^set$/;
     const func_dec = /^def$/;
-    const methods = /^(?:termite.log)$/;
+    const methods = /^(termite.log)$/;
     const ident = /^(?:\#\w+)$/;
-    const par = /^(?::\()|(?:\):)$/;
+    const par = /^(?:\()|(?:\):)$/;
     const block = /^(?::\|)|(?:\|:)$/;
     const term = /^\|$/;
     const comma = /^\,$/;
@@ -78,14 +78,19 @@ class Lexer {
       } else if (digit.test(token)) {
         this.out.push({ Type: Type.NUMBER, value: token });
       } else if (char.test(token)) {
-        this.out.push({ Token: Type.STRING, value: token });
+        this.out.push({ Type: Type.STRING, value: token });
+      //tokenize functions
       } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
+          let l_par = token.match(/\(/); //not working, need something to tokenize (
+          l_par.substr(0, 1);
+          this.out.push({Type: Type.DELIMITER, value: l_par});
         let guts = token.split(/\(|\)/);
         this.out.push({ Type: Type.IDENTIFIER, value: guts[0] });
         guts.slice(1, guts.length - 1).forEach((part) => {
           let params = part.split(",");
           params.forEach((param) => {
             this.out.push({ Type: Type.PARAMETER, value: param });
+        //need something to tokennize ) -- executes in order of matches usually
           });
         });
       } else if (variable.test(token)) {
@@ -94,6 +99,7 @@ class Lexer {
         this.out.push({ Type: Type.IDENTIFIER, value: token });
       } else if (func_dec.test(token)) {
         this.out.push({ Type: Type.FUNCTION, value: token });
+      //need subcases here
       } else if (methods.test(token)) {
         this.out.push({ Type: Type.METHOD, value: token });
       } else if (par.test(token)) {
@@ -102,6 +108,7 @@ class Lexer {
         this.out.push({ Type: Type.DELIMITER, value: token });
       } else if (block.test(token)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
+        //tokenize terminator (also cases for no space)
       } else if (term.test(token)) {
         this.out.push({ Type: Type.TERMINATOR, value: token });
       } else if (token.match(/[^0-9]\|$/)) {
@@ -115,6 +122,7 @@ class Lexer {
         let end = token.substr(token.length - 1, 1);
         this.out.push({ Type: Type.TERMINATOR, value: end });
       }
+      //need parentheses subcase just like this when attached to other info
     });
     console.log(this.out);
   }
