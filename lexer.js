@@ -47,39 +47,24 @@ class Lexer {
   }
 
   lex() {
-    //regex to scan for and tokenize. Can include more groups for methods/keywords as lang grows
     //still need to add cases for arrays, logical ops, and bools
-    const add = /^\+$/;
-    const sub = /^\-$/;
-    const div = /^\/$/;
-    const mult = /^\*$/;
-    const eq = /^\=$/;
-    const digit = /^\d+$/;
-    const char = /^[a-zA-z]$/;
-    const variable = /^set$/;
-    const func_dec = /^def$/;
-    const methods = /^(termite\.log(.*))$/;
-    const ident = /^(?:\#\w+)$/;
-    const par = /^(?:\()|(?:\):)$/;
-    const block = /^(?::\|)|(?:\|:)$/;
-    const term = /^\|$/;
-    const comma = /^\,$/;
 
-    //categorize tokens
     this.in.forEach((token) => {
       if (
-        add.test(token) ||
-        sub.test(token) ||
-        div.test(token) ||
-        mult.test(token)
+        token.match(/^\+$/) ||
+        token.match(/^\-$/) ||
+        token.match(/^\/$/) ||
+        token.match(/^\*$/)
       ) {
         this.out.push({ Type: Type.OPERATOR, value: token });
-      } else if (eq.test(token)) {
+      } else if (token.match(/^\=$/)) {
         this.out.push({ Type: Type.EQUALS, value: token });
-      } else if (digit.test(token)) {
+      } else if (token.match(/^\d+$/)) {
         this.out.push({ Type: Type.NUMBER, value: token });
-      } else if (char.test(token)) {
-        this.out.push({ Type: Type.STRING, value: token });
+      } else if (token.match(/^[a-zA-z]$/)) {
+        if (token.match(/\*\/[\s\S]*\/\*/)) {
+          return;
+        } else {this.out.push({ Type: Type.STRING, value: token });}
         //tokenize functions
       } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
         let guts = token.split(/\(|\)/);
@@ -93,32 +78,50 @@ class Lexer {
             this.out.push({ Type: Type.PARAMETER, value: param });
           });
         });
-         if (token.match(/\)\|$/)) {
-          let end = token.substr(token.length - 1, 1);
-          this.out.push({Type: Type.DELIMITER, value: r_par[0]});
-          this.out.push({ Type: Type.TERMINATOR, value: end });
+        if (token.match(/\)\|$/)) {
+          this.out.push({ Type: Type.DELIMITER, value: r_par[0] });
+          this.out.push({ Type: Type.TERMINATOR, value: guts[guts.length-1] });
         } else if (r_par) {
-          this.out.push({ Type: Type.DELIMITER, value: r_par[r_par.length - 1] });
-          }
-      } else if (variable.test(token)) {
+          this.out.push({
+            Type: Type.DELIMITER,
+            value: r_par[r_par.length - 1],
+          });
+        }
+      } else if (token.match(/^set$/)) {
         this.out.push({ Type: Type.VARIABLE, value: token });
-      } else if (ident.test(token)) {
+      } else if (token.match(/^(?:\#\w+)$/)) {
         this.out.push({ Type: Type.IDENTIFIER, value: token });
-      } else if (func_dec.test(token)) {
+      } else if (token.match(/^def$/)) {
         this.out.push({ Type: Type.FUNCTION, value: token });
         //need subcases here
-      } else if (methods.test(token)) {
-        this.out.push({ Type: Type.METHOD, value: token });
-      } else if (par.test(token)) {
+      } else if (token.match(/termite\.log/)) {
+        let guts = token.split(/\(|\)/);
+        let l_par = token.match(/\(/);
+        let r_par = token.match(/\)/);
+        this.out.push({ Type: Type.METHOD, value: guts[0] });
+        this.out.push({ Type: Type.DELIMITER, value: l_par[0] });
+        guts.slice(1).forEach((part) => {
+            this.out.push({ Type: Type.PARAMETER, value: part });
+          });
+        if (token.match(/\)\|$/)) {
+          this.out.push({ Type: Type.DELIMITER, value: r_par[0] });
+          this.out.push({ Type: Type.TERMINATOR, value: guts[guts.length-1] });
+        } else if (r_par) {
+          this.out.push({
+            Type: Type.DELIMITER,
+            value: r_par[r_par.length - 1],
+          });
+        }
+      } else if (token.match(/^(?:\()|(?:\):)$/)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
-      } else if (comma.test(token)) {
+      } else if (token.match(/^\,$/)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
-      } else if (block.test(token)) {
+      } else if (token.match(/^(?::\|)|(?:\|:)$/)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
         //tokenize terminator
-      } else if (term.test(token)) {
+      } else if (token.match(/^\|$/)) {
         this.out.push({ Type: Type.TERMINATOR, value: token });
-      } else if (token.match(/[^0-9]\|$/)) {
+      } else if (token.match(/[^0-9 | \)]\|$/)) {
         let attached = token.substr(0, token.length - 1);
         this.out.push({ Type: Type.STRING, value: attached });
         let end = token.substr(token.length - 1, 1);
@@ -128,7 +131,7 @@ class Lexer {
         this.out.push({ Type: Type.NUMBER, value: attached });
         let end = token.substr(token.length - 1, 1);
         this.out.push({ Type: Type.TERMINATOR, value: end });
-      } 
+      }
     });
     console.log(this.out);
   }
