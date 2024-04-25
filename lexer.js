@@ -92,7 +92,6 @@ class Lexer {
     let r_brace = token.match(/\}/);
     let guts = token.split(/\{|\}/);
     this.out.push({ Type: Type.DELIMITER, value: l_brace[0] });
-    console.log(guts);
     guts.slice(1, guts.length - 1).forEach((part) => {
       let values = part.split("," || ", ");
       values.forEach((value) => {
