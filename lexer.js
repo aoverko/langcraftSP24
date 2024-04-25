@@ -45,6 +45,55 @@ class Lexer {
     this.in = input.toString().split(/\s+/);
     this.out = [];
   }
+  //helper function: group tokens separated by spaces
+  group(start, end) {
+    let consec = false;
+    let matches = [];
+    let sequence = [];
+    this.in.forEach((token) => {
+      if (!consec && token.match(start)) {
+        consec = true;
+        matches.push(token);
+      } else if (consec && token.match(end)) {
+        consec = false;
+        matches.push(token);
+        sequence.push([...matches]);
+        matches = [];
+      }
+    });
+    console.log(sequence.join(",").toString());
+    return sequence.join(",").toString();
+  }
+
+  //helper function: tokenize complex syntax
+  categorize(token, type) {
+    let guts = token.split(/\(|\)/);
+    let l_par = token.match(/\(/);
+    let r_par = token.match(/\)/);
+    this.out.push({ Type: type, value: guts[0] });
+    this.out.push({ Type: Type.DELIMITER, value: l_par[0] });
+    guts.slice(1, guts.length - 1).forEach((part) => {
+      let params = part.split(",");
+      params.forEach((param) => {
+        this.out.push({ Type: Type.PARAMETER, value: param });
+        if (param.match(/\s+/)) {
+          this.out.push({ Type: Type.PARAMETER, value: "," });
+        }
+      });
+    });
+    if (token.match(/\)\|$/)) {
+      this.out.push({ Type: Type.DELIMITER, value: r_par[0] });
+      this.out.push({
+        Type: Type.TERMINATOR,
+        value: guts[guts.length - 1],
+      });
+    } else if (r_par) {
+      this.out.push({
+        Type: Type.DELIMITER,
+        value: r_par[r_par.length - 1],
+      });
+    }
+  }
 
   lex() {
     //still need to add cases for arrays, logical ops, and bools
@@ -64,53 +113,23 @@ class Lexer {
       } else if (token.match(/^[a-zA-z]$/)) {
         if (token.match(/\*\/[\s\S]*\/\*/)) {
           return;
-        } else {this.out.push({ Type: Type.STRING, value: token });}
-        //tokenize functions
-      } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
-        let guts = token.split(/\(|\)/);
-        let l_par = token.match(/\(/);
-        let r_par = token.match(/\)/);
-        this.out.push({ Type: Type.FUNC_NAME, value: guts[0] });
-        this.out.push({ Type: Type.DELIMITER, value: l_par[0] });
-        guts.slice(1, guts.length - 1).forEach((part) => {
-          let params = part.split(",");
-          params.forEach((param) => {
-            this.out.push({ Type: Type.PARAMETER, value: param });
-          });
-        });
-        if (token.match(/\)\|$/)) {
-          this.out.push({ Type: Type.DELIMITER, value: r_par[0] });
-          this.out.push({ Type: Type.TERMINATOR, value: guts[guts.length-1] });
-        } else if (r_par) {
-          this.out.push({
-            Type: Type.DELIMITER,
-            value: r_par[r_par.length - 1],
-          });
+        } else {
+          this.out.push({ Type: Type.STRING, value: token });
         }
+      } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
+        this.categorize(token, Type.FUNC_NAME);
       } else if (token.match(/^set$/)) {
         this.out.push({ Type: Type.VARIABLE, value: token });
       } else if (token.match(/^(?:\#\w+)$/)) {
         this.out.push({ Type: Type.IDENTIFIER, value: token });
       } else if (token.match(/^def$/)) {
         this.out.push({ Type: Type.FUNCTION, value: token });
-        //need subcases here
-      } else if (token.match(/termite\.log/)) {
-        let guts = token.split(/\(|\)/);
-        let l_par = token.match(/\(/);
-        let r_par = token.match(/\)/);
-        this.out.push({ Type: Type.METHOD, value: guts[0] });
-        this.out.push({ Type: Type.DELIMITER, value: l_par[0] });
-        guts.slice(1).forEach((part) => {
-            this.out.push({ Type: Type.PARAMETER, value: part });
-          });
-        if (token.match(/\)\|$/)) {
-          this.out.push({ Type: Type.DELIMITER, value: r_par[0] });
-          this.out.push({ Type: Type.TERMINATOR, value: guts[guts.length-1] });
-        } else if (r_par) {
-          this.out.push({
-            Type: Type.DELIMITER,
-            value: r_par[r_par.length - 1],
-          });
+      } else if (token.match(/termite\.log\(/)) {
+        let group = this.group(/termite\.log/, /\)/);
+        if (group) {
+          this.categorize(group, Type.METHOD);
+        } if (token) {
+        this.categorize(token, Type.METHOD);
         }
       } else if (token.match(/^(?:\()|(?:\):)$/)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
