@@ -10,7 +10,7 @@ const rl = readline.createInterface({
 
 //Get file data from user
 rl.question("Enter your file name: ", (fileName) => {
-  rl.close(); //close terminal to prevent further input
+  rl.close();
   fs.readFile(fileName, "utf8", (err, data) => {
     if (err) {
       console.log(err);
@@ -29,11 +29,14 @@ class Type {
   static NUMBER = "NUMBER";
   static IDENTIFIER = "IDENTIFIER";
   static FUNC_NAME = "FUNC_NAME";
-  static VARIABLE = "VARIABLE";
+  static DECLARE = "DECLARE";
   static EQUALS = "EQUALS";
   static OPERATOR = "OPERATOR";
   static FUNCTION = "FUNCTION";
+  static CLASS = "CLASS";
   static PARAMETER = "PARAMETER";
+  static ARRAY = "ARRAY";
+  static ARR_VALS = "ARR_VALS";
   static METHOD = "METHOD";
   static KEYWORD = "KEYWORD";
   static DELIMITER = "DELIMITER";
@@ -43,29 +46,40 @@ class Type {
 class Lexer {
   constructor(input) {
     this.in = input.toString().split(/\s+/);
-    this.base = this.process();
+    this.base = this.processInput();
     this.out = [];
   }
   //find instances where a token is split by a space and group it
-  //also groups multi-line comments so they don't tokenize
-  process() {
+  //also groups comments so they don't tokenize
+  processInput() {
     let output = [];
     let matches = "";
     let isMatching = false;
     this.in.forEach((token) => {
-      if (
-        !isMatching &&
-        (token.match(/termite\.log/) || token.match(/^\*\//))
+      if (token.match(/termite\.log\([^()]+\)/)) {
+        output.push(token);
+      } else if (
+        (!isMatching &&
+          (token.match(/termite\.log/) ||
+            token.match(/^\*\//) ||
+            token.match(/^\*\*/))) ||
+        token.match(/^\{/)
       ) {
         isMatching = true;
-        matches = token;
-      } else if (isMatching && (token.match(/\)/) || token.match(/\/\*$/))) {
+        matches = token + " ";
+      } else if (
+        isMatching &&
+        (token.match(/\)/) ||
+          token.match(/\/\*$/) ||
+          token.match(/\*\*$/) ||
+          token.match(/\}\|$/) ||
+          token.match(/\}$/))
+      ) {
         isMatching = false;
-        matches += token;
+        matches += token + " ";
         output.push(matches);
-        matches = "";
       } else if (isMatching) {
-        matches += token;
+        matches += token + " ";
       } else {
         output.push(token);
       }
@@ -73,7 +87,34 @@ class Lexer {
     return output;
   }
 
-  //helper function: tokenize complex syntax
+  processArray(token) {
+    let l_brace = token.match(/\{/);
+    let r_brace = token.match(/\}/);
+    let guts = token.split(/\{|\}/);
+    this.out.push({ Type: Type.DELIMITER, value: l_brace[0] });
+    console.log(guts);
+    guts.slice(1, guts.length - 1).forEach((part) => {
+      let values = part.split("," || ", ");
+      values.forEach((value) => {
+        let index = value.trim();
+        this.out.push({ Type: Type.ARR_VALS, value: index });
+      })
+    });
+    if (token.match(/\}\|$/)) {
+      this.out.push({ Type: Type.DELIMITER, value: r_brace[0] });
+      this.out.push({
+        Type: Type.TERMINATOR,
+        value: guts[guts.length-1],
+      });
+    } else if (r_brace) {
+      this.out.push({
+        Type: Type.DELIMITER,
+        value: r_brace[r_brace.length - 1],
+      });
+    }
+  }
+
+  //helper function: tokenize functional syntax
   categorize(token, type) {
     let guts = token.split(/\(|\)/);
     let l_par = token.match(/\(/);
@@ -81,13 +122,14 @@ class Lexer {
     this.out.push({ Type: type, value: guts[0] });
     this.out.push({ Type: Type.DELIMITER, value: l_par[0] });
     guts.slice(1, guts.length - 1).forEach((part) => {
-      let params = part.split(",");
-      params.forEach((param) => {
-        this.out.push({ Type: Type.PARAMETER, value: param });
-        if (param.match(/\s+/)) {
-          this.out.push({ Type: Type.PARAMETER, value: "," });
-        }
-      });
+      if (type == Type.FUNC_NAME) {
+        let params = part.split("," || ", ");
+        params.forEach((param) => {
+          this.out.push({ Type: Type.PARAMETER, value: param });
+        });
+      } else if (type == Type.METHOD) {
+        this.out.push({Type: Type.PARAMETER, value: part});
+      }
     });
     if (token.match(/\)\|$/)) {
       this.out.push({ Type: Type.DELIMITER, value: r_par[0] });
@@ -135,21 +177,21 @@ class Lexer {
       } else if (token.match(/^\d+$/)) {
         this.out.push({ Type: Type.NUMBER, value: token });
       } else if (token.match(/^[a-zA-z]$/)) {
-        if (token.match(/\*\/[\s\S]*\/\*/)) {
-          return;
-        } else {
-          this.out.push({ Type: Type.STRING, value: token });
-        }
+        this.out.push({ Type: Type.STRING, value: token });
       } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
         this.categorize(token, Type.FUNC_NAME);
       } else if (token.match(/^set$/)) {
-        this.out.push({ Type: Type.VARIABLE, value: token });
+        this.out.push({ Type: Type.DECLARE, value: token });
       } else if (token.match(/^(?:\#\w+)$/)) {
         this.out.push({ Type: Type.IDENTIFIER, value: token });
+      } else if (token.match(/^group$/)) {
+        this.out.push({ Type: Type.CLASS, value: token });
       } else if (token.match(/^def$/)) {
         this.out.push({ Type: Type.FUNCTION, value: token });
       } else if (token.match(/termite\.log\(/)) {
         this.categorize(token, Type.METHOD);
+      } else if (token.match(/^\{/)) {
+        this.processArray(token);
       } else if (token.match(/^(?:\()|(?:\):)$/)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
       } else if (token.match(/^\,$/)) {
@@ -159,7 +201,7 @@ class Lexer {
         //tokenize terminator
       } else if (token.match(/^\|$/)) {
         this.out.push({ Type: Type.TERMINATOR, value: token });
-      } else if (token.match(/[^0-9 | \)]\|$/)) {
+      } else if (token.match(/[^0-9 | \) | \}]\|$/)) {
         this.termCase(token, Type.STRING);
       } else if (token.match(/\d+\|$/)) {
         this.termCase(token, Type.NUMBER);
