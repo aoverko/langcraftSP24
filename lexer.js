@@ -43,26 +43,34 @@ class Type {
 class Lexer {
   constructor(input) {
     this.in = input.toString().split(/\s+/);
+    this.base = this.process();
     this.out = [];
   }
-  //helper function: group tokens separated by spaces
-  group(start, end) {
-    let consec = false;
-    let matches = [];
-    let sequence = [];
+  //find instances where a token is split by a space and group it
+  //also groups multi-line comments so they don't tokenize
+  process() {
+    let output = [];
+    let matches = "";
+    let isMatching = false;
     this.in.forEach((token) => {
-      if (!consec && token.match(start)) {
-        consec = true;
-        matches.push(token);
-      } else if (consec && token.match(end)) {
-        consec = false;
-        matches.push(token);
-        sequence.push([...matches]);
-        matches = [];
+      if (
+        !isMatching &&
+        (token.match(/termite\.log/) || token.match(/^\*\//))
+      ) {
+        isMatching = true;
+        matches = token;
+      } else if (isMatching && (token.match(/\)/) || token.match(/\/\*$/))) {
+        isMatching = false;
+        matches += token;
+        output.push(matches);
+        matches = "";
+      } else if (isMatching) {
+        matches += token;
+      } else {
+        output.push(token);
       }
     });
-    console.log(sequence.join(",").toString());
-    return sequence.join(",").toString();
+    return output;
   }
 
   //helper function: tokenize complex syntax
@@ -95,15 +103,31 @@ class Lexer {
     }
   }
 
-  lex() {
-    //still need to add cases for arrays, logical ops, and bools
+  //helper function for when there's no space btwn a terminator and value
+  termCase(token, type) {
+    let attached = token.substr(0, token.length - 1);
+    this.out.push({ Type: type, value: attached });
+    let end = token.substr(token.length - 1, 1);
+    this.out.push({ Type: Type.TERMINATOR, value: end });
+  }
 
-    this.in.forEach((token) => {
+  lex() {
+    //still need to add cases for arrays, if/else, classes
+    this.base.forEach((token) => {
       if (
         token.match(/^\+$/) ||
         token.match(/^\-$/) ||
         token.match(/^\/$/) ||
-        token.match(/^\*$/)
+        token.match(/^\*$/) ||
+        token.match(/^\</) ||
+        token.match(/^\>/) ||
+        token.match(/^\<\=/) ||
+        token.match(/^\>\=/) ||
+        token.match(/^and$/) ||
+        token.match(/^or$/) ||
+        token.match(/^not$/) ||
+        token.match(/^T\:$/) ||
+        token.match(/^F\:$/)
       ) {
         this.out.push({ Type: Type.OPERATOR, value: token });
       } else if (token.match(/^\=$/)) {
@@ -125,12 +149,7 @@ class Lexer {
       } else if (token.match(/^def$/)) {
         this.out.push({ Type: Type.FUNCTION, value: token });
       } else if (token.match(/termite\.log\(/)) {
-        let group = this.group(/termite\.log/, /\)/);
-        if (group) {
-          this.categorize(group, Type.METHOD);
-        } if (token) {
         this.categorize(token, Type.METHOD);
-        }
       } else if (token.match(/^(?:\()|(?:\):)$/)) {
         this.out.push({ Type: Type.DELIMITER, value: token });
       } else if (token.match(/^\,$/)) {
@@ -141,15 +160,9 @@ class Lexer {
       } else if (token.match(/^\|$/)) {
         this.out.push({ Type: Type.TERMINATOR, value: token });
       } else if (token.match(/[^0-9 | \)]\|$/)) {
-        let attached = token.substr(0, token.length - 1);
-        this.out.push({ Type: Type.STRING, value: attached });
-        let end = token.substr(token.length - 1, 1);
-        this.out.push({ Type: Type.TERMINATOR, value: end });
+        this.termCase(token, Type.STRING);
       } else if (token.match(/\d+\|$/)) {
-        let attached = token.substr(0, token.length - 1);
-        this.out.push({ Type: Type.NUMBER, value: attached });
-        let end = token.substr(token.length - 1, 1);
-        this.out.push({ Type: Type.TERMINATOR, value: end });
+        this.termCase(token, Type.NUMBER);
       }
     });
     console.log(this.out);
