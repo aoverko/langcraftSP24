@@ -76,7 +76,7 @@ class Lexer {
           token.match(/\}$/))
       ) {
         isMatching = false;
-        matches += token + " ";
+        matches += token;
         output.push(matches);
       } else if (isMatching) {
         matches += token + " ";
@@ -98,13 +98,13 @@ class Lexer {
       values.forEach((value) => {
         let index = value.trim();
         this.out.push({ Type: Type.ARR_VALS, value: index });
-      })
+      });
     });
-    if (token.match(/\}\|$/)) {
+    if (token.match(/\}\|/)) {
       this.out.push({ Type: Type.DELIMITER, value: r_brace[0] });
       this.out.push({
         Type: Type.TERMINATOR,
-        value: guts[guts.length-1],
+        value: guts[guts.length - 1],
       });
     } else if (r_brace) {
       this.out.push({
@@ -128,7 +128,7 @@ class Lexer {
           this.out.push({ Type: Type.PARAMETER, value: param });
         });
       } else if (type == Type.METHOD) {
-        this.out.push({Type: Type.PARAMETER, value: part});
+        this.out.push({ Type: Type.PARAMETER, value: part });
       }
     });
     if (token.match(/\)\|$/)) {
