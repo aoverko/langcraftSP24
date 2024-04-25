@@ -207,5 +207,6 @@ class Lexer {
       }
     });
     console.log(this.out);
+    return this.out;
   }
 }
