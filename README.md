@@ -1,10 +1,12 @@
 # langcraftSP24
 
 CodenetLang
-1. Add Picture here
+1. ![GitHub Logo](/images/cnet.png)
+
 2. Creators: Bogdan Mygovych, Ariana O, Jonah Y
 3. Language Overview: This language is built on top of JS and is a general-purpose language.
 4. Sample Code: 
+
 ** This is a single comment **
 
 */ This is
