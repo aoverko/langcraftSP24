@@ -189,6 +189,8 @@ class Lexer {
         this.out.push({ Type: Type.FUNCTION, value: token });
       } else if (token.match(/termite\.log\(/)) {
         this.categorize(token, Type.METHOD);
+      } else if (token.match(/^Return$/)) {
+        this.out.push({Type: Type.METHOD, value: token});
       } else if (token.match(/^\{/)) {
         this.processArray(token);
       } else if (token.match(/^(?:\()|(?:\):)$/)) {

@@ -21,7 +21,9 @@ rl.question("Enter your file name: ", (fileName) => {
       const parserInstance = new Parser(tokens);
       const ast = parserInstance.parse();
       const interpreter = new Interpreter();
-      interpreter.evaluateAST(ast);
+      const result = interpreter.evaluateAST(ast);
+
+      console.log(result);
     });
   });
   
@@ -192,6 +194,8 @@ class Lexer {
         this.out.push({ Type: Type.FUNCTION, value: token });
       } else if (token.match(/termite\.log\(/)) {
         this.categorize(token, Type.METHOD);
+      } else if (token.match(/^Return$/)) {
+        this.out.push({Type: Type.METHOD, value: token});
       } else if (token.match(/^\{/)) {
         this.processArray(token);
       } else if (token.match(/^(?:\()|(?:\):)$/)) {
