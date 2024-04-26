@@ -244,6 +244,7 @@ class Parser {
                     this.current++;  // Skip unrecognized tokens or add error handling
             }
         }
+        console.log(ast);
         return ast;
     }
 
