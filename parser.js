@@ -221,108 +221,81 @@ class Lexer {
 class Parser {
     constructor(tokens) {
         this.tokens = tokens;
-        this.current = 0;
+        this.index = 0;
     }
 
     parse() {
         const ast = [];
-        while (this.current < this.tokens.length) {
-            switch (this.tokens[this.current].Type) {
-                case Type.FUNCTION:
-                    ast.push(this.parseFunction());
-                    break;
-                case Type.DECLARE:
-                    ast.push(this.parseDeclaration());
-                    break;
-                case Type.METHOD:
-                    ast.push(this.parseLog());
-                    break;
-                case Type.TERMINATOR:
-                    this.current++;
-                    break;
-                default:
-                    this.current++;  // Skip unrecognized tokens or add error handling
+        while (this.index < this.tokens.length) {
+            const token = this.tokens[this.index];
+            if (token.Type === Type.METHOD && token.value === 'termite.log') {
+                ast.push(this.parseLog());
+            } else if (token.Type === Type.METHOD && token.value === 'set') {
+                ast.push(this.parseDeclaration());
             }
+            this.index++;
         }
-        console.log(ast);
         return ast;
     }
 
-    parseFunction() {
-        this.current++;  // Skip 'def'
-        const name = this.tokens[this.current++].value;
-        const params = this.parseParameters();
-        this.current++;  // Skip ':|'
-        const body = this.parseBlock();
-        this.current++;  // Skip '|:'
-        return { type: 'Function', name, params, body };
-    }
-
-    parseParameters() {
-        const params = [];
-        while (this.tokens[this.current].Type !== Type.DELIMITER) {
-            params.push(this.tokens[this.current++].value);
-        }
-        return params;
-    }
-
-    parseBlock() {
-        const body = [];
-        while (this.tokens[this.current].Type !== Type.TERMINATOR) {
-            body.push(this.parseStatement());
-        }
-        return body;
-    }
-
-    parseDeclaration() {
-        this.current++;  // Skip 'set'
-        const name = this.tokens[this.current++].value;
-        this.current++;  // Skip '='
-        const value = this.tokens[this.current].value;
-        this.current++;  // Skip to next token
-        return { type: 'Declaration', name, value };
-    }
-
     parseLog() {
-        this.current++;  // Skip 'termite.log'
-        const message = this.tokens[this.current++].value;
-        this.current++;  // Skip '|'
+        this.index++;
+        const message = this.tokens[this.index].value;
         return { type: 'Log', message };
     }
 
-    parseStatement() {
-        // Simple example, expand based on language features
-        return this.parseDeclaration();  // Assuming only declarations in blocks for now
+    parseDeclaration() {
+        this.index++;
+        const name = this.tokens[this.index++].value;
+        this.index++; // skip the '='
+        const value = this.tokens[this.index].value;
+        return { type: 'Declaration', name, value };
     }
 }
 
 class Interpreter {
     constructor() {
         this.variables = {};
-        this.functions = {};
     }
 
-    evaluateAST(ast) {
+    // Example of adding error handling in the Interpreter
+evaluateAST(ast) {
+    try {
         ast.forEach(node => {
-            switch (node.type) {
-                case 'Function':
-                    this.functions[node.name] = node;
-                    break;
-                case 'Declaration':
-                    this.variables[node.name] = this.evaluateExpression(node.value);
-                    break;
-                case 'Log':
-                    console.log(this.evaluateExpression(node.message));
-                    break;
+            if (node.type === 'Log') {
+                console.log(node.message);
+            } else if (node.type === 'Declaration') {
+                this.variables[node.name] = node.value;
             }
         });
-    }
-
-    evaluateExpression(expression) {
-        if (expression.match(/^\d+$/)) {
-            return parseInt(expression);
-        }
-        return expression;  // Return as is if it's not a recognizable expression
+    } catch (error) {
+        console.error("Error evaluating AST:", error);
     }
 }
+}
+
+
+
+rl.question("Enter your file name: ", (fileName) => {
+    console.log("Reading file:", fileName);
+    fs.readFile(fileName, "utf8", (err, data) => {
+        rl.close();
+        if (err) {
+            console.log("Error reading file:", err);
+            return;
+        }
+        console.log("File content:", data);
+
+        const lexer = new Lexer(data);
+        const tokens = lexer.lex();
+        console.log("Tokens:", tokens);
+
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        console.log("AST:", ast);
+
+        const interpreter = new Interpreter();
+        interpreter.evaluateAST(ast);
+    });
+});
 
