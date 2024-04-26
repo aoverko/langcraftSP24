@@ -27,8 +27,6 @@ rl.question("Enter your file name: ", (fileName) => {
   
 
 //Lexer logic
-//included types we might not use just so the blueprint is there
-//basically the same effect as enums in the Type class w| static
 class Type {
   static STRING = "STRING";
   static NUMBER = "NUMBER";
@@ -212,6 +210,7 @@ class Lexer {
       }
     });
     console.log(this.out);
+    return this.out;
   }
 }
 
