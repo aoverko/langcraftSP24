@@ -1,14 +1,34 @@
 # langcraftSP24
-Readme file on Github with the following information:
-▪ Picture associated with the language
-▪ Names of all members
-▪ Language Overview
-▪ Example Code Snippet
-▪ This should include at least 7 different lines of code, and give a
-sampling of: comments, variables, and anything else interesting
-(functions, etc)
-▪ Instructions (specific steps on how to execute the code for someone who
-may be interested in trying it)
-▪ Syntax table
-▪ Valid grammar statements (8+)
-▪ State of the Language: What is working right now, and what is not working. 
+
+CodenetLang
+1. Add Picture here
+2. Creators: Bogdan Mygovych, Ariana O, Jonah Y
+3. Language Overview: This language is built on top of JS and is a general-purpose language.
+4. Sample Code: 
+** This is a single comment **
+
+*/ This is
+   a multi-line
+   comment /*
+
+termite.log("Hello, world!")|
+
+set #project = "CodeNetLang"|
+
+set #array = {1, 2, 3}|
+
+def #add(a,b) :| 
+	Return a + b|
+|:
+
+set #result = #add(5,3)|
+termite.log(#result)| 
+
+5. Instructions: 
+6. Syntax Table:
+7. Grammer Statements:
+8. State of the Language:
+
+
+
+    
