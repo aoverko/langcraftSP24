@@ -29,14 +29,29 @@ const tokens = [
     {"type": type.DELIMITER, "value": ")"},
     {"type": type.TERMINATOR, "value": "|"},
 
-    // #PROJECT
+    // set #PROJECT
     {"type": type.VARIABLE, "value": "set"},
     {"type": type.IDENTIFIER, "value": "#project"},
     {"type": type.ASSIGNMENT, "value": "="},
     {"type": type.STRING, "value": "CodeNetLang"},
     {"type": type.TERMINATOR, "value": "|"},
 
-    // #ADD
+
+    // set #ARRAY
+    {"type": type.VARIABLE, "value": "set"},
+    {"type": type.IDENTIFIER, "value": "#array"},
+    {"type": type.ASSIGNMENT, "value": "="},
+    {"type": type.DELIMITER, "value": "{"},
+    {"type": type.PARAM, "value": "1"},
+    {"type": type.DELIMITER, "value": ","},
+    {"type": type.PARAM, "value": "2"},
+    {"type": type.DELIMITER, "value": ","},
+    {"type": type.PARAM, "value": "3"},
+    {"type": type.DELIMITER, "value": "}"},
+    {"type": type.TERMINATOR, "value": "|"},
+
+
+    // def #ADD
     {"type": type.FUNCTION, "value": "def"},
     {"type": type.IDENTIFIER, "value": "#add"},
     {"type": type.DELIMITER, "value": "("},
@@ -52,7 +67,7 @@ const tokens = [
     {"type": type.TERMINATOR, "value": "|"},
     {"type": type.DELIMITER, "value": "|:"},
 
-    // #RESULT
+    // set #RESULT
     {"type": type.VARIABLE, "value": "set"},
     {"type": type.IDENTIFIER, "value": "#result"},
     {"type": type.ASSIGNMENT, "value": "="},
