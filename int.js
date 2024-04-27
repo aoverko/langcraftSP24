@@ -1,12 +1,13 @@
-const fs = require("fs");
-const readline = require("readline");
+const fs = require("fs"); //import filesystem library
+const readline = require("readline"); //import readline library
 
-const rl = readline.createInterface({
+const rl = readline.createInterface({ //create interface
     input: process.stdin,
     output: process.stdout
   });
 
-class Type {
+//define token types
+  class Type {
     static STRING = "STRING";
     static NUMBER = "NUMBER";
     static IDENTIFIER = "IDENTIFIER";
@@ -38,18 +39,19 @@ class Lexer {
       let matches = "";
       let isMatching = false;
       this.in.forEach((token) => {
-        if (token.match(/termite\.log\([^()]+\)/)) {
+        //case for termite.log with no spaces so it's not overridden by the case with spaces
+        if (token.match(/termite\.log\([^()]+\)/)) { 
           output.push(token);
-        } else if (
-          (!isMatching &&
+        } else if ( //first match where something might be split by an unwanted space
+          (!isMatching && 
             (token.match(/termite\.log/) ||
               token.match(/^\*\//) ||
               token.match(/^\*\*/))) ||
           token.match(/^\{/)
-        ) {
+        ) {//add the token to the matches
           isMatching = true;
           matches = token + " ";
-        } else if (
+        } else if ( //matches the end of that case and adds it to matches. isMatching now false
           isMatching &&
           (token.match(/\)/) ||
             token.match(/\/\*$/) ||
@@ -60,34 +62,35 @@ class Lexer {
           isMatching = false;
           matches += token;
           output.push(matches);
-        } else if (isMatching) {
+        } else if (isMatching) { //while still matching add token to matches
           matches += token + " ";
-        } else {
+        } else { //otherwise tokens are added as usual
           output.push(token);
         }
       });
-      return output;
+      return output; //output fed to this.base in constructor
     }
-  
+    
+    //helper function: separate {} delims and individual array values
     processArray(token) {
       let l_brace = token.match(/\{/);
       let r_brace = token.match(/\}/);
-      let guts = token.split(/\{|\}/);
-      this.out.push({ Type: Type.DELIMITER, value: l_brace[0] });
+      let guts = token.split(/\{|\}/); //reduce array to the values
+      this.out.push({ Type: Type.DELIMITER, value: l_brace[0] }); //if { matches, output it
       guts.slice(1, guts.length - 1).forEach((part) => {
-        let values = part.split("," || ", ");
+        let values = part.split("," || ", "); //split into individual values
         values.forEach((value) => {
-          let index = value.trim();
-          this.out.push({ Type: Type.ARR_VALS, value: index });
+          let index = value.trim(); //remove spaces
+          this.out.push({ Type: Type.ARR_VALS, value: index }); //output value
         });
       });
-      if (token.match(/\}\|/)) {
+      if (token.match(/\}\|/)) { //output }|
         this.out.push({ Type: Type.DELIMITER, value: r_brace[0] });
         this.out.push({
           Type: Type.TERMINATOR,
           value: guts[guts.length - 1],
         });
-      } else if (r_brace) {
+      } else if (r_brace) { //output }
         this.out.push({
           Type: Type.DELIMITER,
           value: r_brace[r_brace.length - 1],
@@ -95,30 +98,30 @@ class Lexer {
       }
     }
   
-    //helper function: tokenize functional syntax
+    //helper function: tokenize functional syntax (functions and termite.log)
     categorize(token, type) {
-      let guts = token.split(/\(|\)/);
+      let guts = token.split(/\(|\)/); //reduce function to parameters and function name
       let l_par = token.match(/\(/);
       let r_par = token.match(/\)/);
-      this.out.push({ Type: type, value: guts[0] });
-      this.out.push({ Type: Type.DELIMITER, value: l_par[0] });
+      this.out.push({ Type: type, value: guts[0] }); //output function name
+      this.out.push({ Type: Type.DELIMITER, value: l_par[0] }); //if ( matches, output it
       guts.slice(1, guts.length - 1).forEach((part) => {
-        if (type == Type.FUNC_NAME) {
-          let params = part.split("," || ", ");
+        if (type == Type.FUNC_NAME) {//split into indiv params if function and output each one
+          let params = part.split("," || ", "); 
           params.forEach((param) => {
             this.out.push({ Type: Type.PARAMETER, value: param });
           });
-        } else if (type == Type.METHOD) {
+        } else if (type == Type.METHOD) {//output the message if it's termite.log
           this.out.push({ Type: Type.PARAMETER, value: part });
         }
       });
-      if (token.match(/\)\|$/)) {
+      if (token.match(/\)\|$/)) {//output )|
         this.out.push({ Type: Type.DELIMITER, value: r_par[0] });
         this.out.push({
           Type: Type.TERMINATOR,
           value: guts[guts.length - 1],
         });
-      } else if (r_par) {
+      } else if (r_par) {//output )
         this.out.push({
           Type: Type.DELIMITER,
           value: r_par[r_par.length - 1],
@@ -126,16 +129,16 @@ class Lexer {
       }
     }
   
-    //helper function for when there's no space btwn a terminator and value
+    //helper function: when there's no space btwn a terminator and value
     termCase(token, type) {
       let attached = token.substr(0, token.length - 1);
-      this.out.push({ Type: type, value: attached });
+      this.out.push({ Type: type, value: attached }); //output whatever is to the left of |
       let end = token.substr(token.length - 1, 1);
-      this.out.push({ Type: Type.TERMINATOR, value: end });
+      this.out.push({ Type: Type.TERMINATOR, value: end }); //output |
     }
   
     lex() {
-      //still need to add cases for arrays, if/else, classes
+      //tokenize operators
       this.base.forEach((token) => {
         if (
           token.match(/^\+$/) ||
@@ -153,39 +156,55 @@ class Lexer {
           token.match(/^F\:$/)
         ) {
           this.out.push({ Type: Type.OPERATOR, value: token });
+          //tokenize assignment op: = 
         } else if (token.match(/^\=$/)) {
           this.out.push({ Type: Type.EQUALS, value: token });
+          //tokenize numbers
         } else if (token.match(/^\d+$/)) {
           this.out.push({ Type: Type.NUMBER, value: token });
+          //tokenize characters
         } else if (token.match(/^[a-zA-z]$/)) {
           this.out.push({ Type: Type.STRING, value: token });
+          //tokenize functions by calling the helper function
         } else if (token.match(/^(?:\#\w+)/) && token.match(/\(|\)/)) {
           this.categorize(token, Type.FUNC_NAME);
+          //tokenize variable declaration
         } else if (token.match(/^set$/)) {
           this.out.push({ Type: Type.DECLARE, value: token });
+          //tokenize identifiers
         } else if (token.match(/^(?:\#\w+)$/)) {
           this.out.push({ Type: Type.IDENTIFIER, value: token });
+          //tokenize class declaration
         } else if (token.match(/^group$/)) {
           this.out.push({ Type: Type.CLASS, value: token });
+          //tokenize function declaration
         } else if (token.match(/^def$/)) {
           this.out.push({ Type: Type.FUNCTION, value: token });
+          //tokenize the termite.log method with a helper function call
         } else if (token.match(/termite\.log\(/)) {
           this.categorize(token, Type.METHOD);
+          //tokenize the Return method
         } else if (token.match(/^Return$/)) {
           this.out.push({Type: Type.METHOD, value: token});
+          //tokenize arrays and their values (with helper function)
         } else if (token.match(/^\{/)) {
           this.processArray(token);
+          //tokenize individual delimiters ( )
         } else if (token.match(/^(?:\()|(?:\):)$/)) {
           this.out.push({ Type: Type.DELIMITER, value: token });
+          //tokenize individual commas
         } else if (token.match(/^\,$/)) {
           this.out.push({ Type: Type.DELIMITER, value: token });
+          //tokenize individual code block delimiters
         } else if (token.match(/^(?::\|)|(?:\|:)$/)) {
           this.out.push({ Type: Type.DELIMITER, value: token });
-          //tokenize terminator
+          //tokenize individual terminator
         } else if (token.match(/^\|$/)) {
           this.out.push({ Type: Type.TERMINATOR, value: token });
+          //tokenize terminator attached to a character/string
         } else if (token.match(/[^0-9 | \) | \}]\|$/)) {
           this.termCase(token, Type.STRING);
+          //tokenize terminator attached to a number
         } else if (token.match(/\d+\|$/)) {
           this.termCase(token, Type.NUMBER);
         }
