@@ -1,9 +1,10 @@
 # CodenetLang
 
-![logo](<codenet logo.png>)
+<img src="codenet_logo.png" alt="logo" width="500">
 
-Creators: Bogdan Mygovych, Ariana Overko, Jonah Y
-Language Overview: This language is built on top of JS and is a general-purpose language.
+
+1) Creators: Bogdan Mygovych, Ariana Overko, Jonah Y
+2) Language Overview: This language is built on top of JS and is a general-purpose language.
 
 ## Sample Code: 
 
