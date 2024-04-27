@@ -79,7 +79,7 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 
 
 ## State of the Language:
-CodenetLang is currently under development. Its lexer is fully functional with all specified syntax above, and the parser creates an ast tree from the tokens. However, the cases for parsing and interpreting only encompass the sample code at this point. It is not fully functioning.
+CodenetLang is currently under development. Its lexer is fully functional with all specified syntax above, and the parser creates an ast tree from the tokens. However, the cases for parsing and interpreting only encompass the sample code at this point. It is not fully functional.
 
 
     
