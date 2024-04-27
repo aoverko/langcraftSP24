@@ -3,6 +3,7 @@
 ![logo](<codenet logo.png>)
 
 Creators: Bogdan Mygovych, Ariana Overko, Jonah Y
+
 Language Overview: This language is built on top of JS and is a general-purpose language.
 
 ## Sample Code: 
