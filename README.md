@@ -1,10 +1,11 @@
 # CodenetLang
 
-1. Import Logo Here:
+![logo](<codenet logo.png>)
 
-2. Creators: Bogdan Mygovych, Ariana O, Jonah Y
-3. Language Overview: This language is built on top of JS and is a general-purpose language.
-4. Sample Code: 
+Creators: Bogdan Mygovych, Ariana Overko, Jonah Y
+Language Overview: This language is built on top of JS and is a general-purpose language.
+
+## Sample Code: 
 
 ** This is a single comment **
 
@@ -25,9 +26,16 @@ def #add(a,b) :|
 set #result = #add(5,3)|
 termite.log(#result)| 
 
-5. Instructions: 
+## Execution Instructions: 
+Note: this language requires having a Node.js environment set up. 
+Download Node.js here: [download](https://nodejs.org/en/download)
 
-6. Syntax Rules: 
+1) Create a separate folder with the CodenetLang Interpreter, and CodenetLang files
+2) Open cmd and change directory to your CodenetLang Folder
+3) Enter node int.js
+4) Once asked for a file name, enter the name of the desired .cnet file
+
+## Syntax Rules: 
 
   Single Line Comments:  **    
 
@@ -45,9 +53,9 @@ termite.log(#result)|
 
   And: and
 
-  True: T
+  True: T:
 
-  False: F
+  False: F:
 
   Less than:  <
 
@@ -57,20 +65,21 @@ termite.log(#result)|
 
   Greater than or equal to: >=
 
-  Unary Operators:  +  -  *  /  
+  Binary Operators:  +  -  *  /  
 
-  Variables:set -> #project
+  Variables: set = #project
 
   Classes: group #classname :|  |:
 
-  Functions: def #name :|   |:
+  Functions: def #function_name :|   |:
 
   Arrays: set #name = {  } 
 
-7. Grammer Statements:
+## Grammar Statements:
 
-8. State of the Language:
 
+## State of the Language:
+CodenetLang is currently under development. Its lexer is fully functional with all specified syntax above, and the parser creates an ast tree from the tokens. However, the cases for parsing and interpreting only encompass the sample code at this point. It is not fully functioning.
 
 
     
