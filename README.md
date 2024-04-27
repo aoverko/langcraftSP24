@@ -1,6 +1,6 @@
 # CodenetLang
 
-<img src="codenet_logo.png" alt="logo" width="500">
+![logo](<codenet logo.png>)
 
 Creators: Bogdan Mygovych, Ariana Overko, Jonah Y
 
