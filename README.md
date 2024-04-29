@@ -7,10 +7,9 @@ Creators: Bogdan Mygovych, Ariana Overko, Jonah Yurkanin
 Language Overview: This language is built on top of JS and is a general-purpose language.
 
 ## Sample Code: 
-
+```
 ** This is a single comment **
 
-```plaintext
 /* This is
    a multi-line
    comment */
@@ -25,8 +24,9 @@ def #add(a,b) :|
 	Return a + b|
 |:
 
-`set #result = #add(5,3)|
-termite.log(#result)| `
+set #result = #add(5,3)|
+termite.log(#result)| 
+```
 
 ## Execution Instructions: 
 Note: this language requires having a Node.js environment set up. 
