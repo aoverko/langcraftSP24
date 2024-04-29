@@ -243,9 +243,9 @@ class Lexer {
     }
 
     parseDeclaration() {
-        const nameToken = this.tokens[++this.index]; // assuming next token is the identifier
-        const equalsToken = this.tokens[++this.index]; // assuming next token is '='
-        const valueToken = this.tokens[++this.index]; // assuming next token is the value
+        const nameToken = this.tokens[++this.index]; // next token is the identifier
+        const equalsToken = this.tokens[++this.index]; // next token is '='
+        const valueToken = this.tokens[++this.index]; // next token is the value
         this.index++; // move past the end of declaration
         return {
             type: 'Declaration',
@@ -256,18 +256,18 @@ class Lexer {
 
     parseFunction() {
         const nameToken = this.tokens[++this.index]; // function name
-        // Add parsing for parameters and function body as needed
+        // Add parsing for parameters and function body
         this.index++; // adjust according to function parsing logic
         return {
             type: 'Function',
             name: nameToken.value
-            // include parameters and body when implemented
+            // include parameters and body
         };
     }
 
     parseMethod() {
         const methodName = this.tokens[++this.index].value; // Get method name
-        this.index++; // Assuming method ends after name for simplicity
+        this.index++; // method ends after name
         return {
             type: 'MethodCall',
             methodName
@@ -288,13 +288,13 @@ class Interpreter {
                 this.lastEvaluated = this.variables[node.name]; // Update last evaluated
                 console.log(`Variable ${node.name} set to ${this.variables[node.name]}`);
             } else if (node.type === 'MethodCall' && node.methodName === 'termite.log') {
-                // Assuming 'termite.log' logs the variable value
-                console.log("Logging:", this.variables[node.methodName]); // This line might need adjustment based on actual logic
+                // 'termite.log' logs the variable value
+                console.log("Logging:", this.variables[node.methodName]); 
                 this.lastEvaluated = this.variables[node.methodName]; // Update last evaluated
             } else if (node.type === 'Function') {
                 // Handle function logic here
                 console.log(`Function ${node.name} defined`); // Function definition logic
-                // Update lastEvaluated as needed based on function logic
+                
             }
         });
         console.log("Interpreter Variable Store:", this.variables);
@@ -303,12 +303,11 @@ class Interpreter {
 
     evaluateExpression(expression) {
         // Placeholder for expression evaluation logic
-        return expression; // Direct return for simplicity in this example
+        return expression; // Direct return for simplicity
     }
 }
 
 
-// Example usage remains the same, ensuring the interpreter is invoked after parsing.
 
 
 rl.question("Enter your file name: ", (fileName) => {
