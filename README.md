@@ -10,9 +10,9 @@ Language Overview: This language is built on top of JS and is a general-purpose 
 
 ** This is a single comment **
 
-*/ This is
+`*/ This is
    a multi-line
-   comment /*
+   comment /*`
 
 termite.log("Hello, world!")|
 
@@ -38,43 +38,28 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 
 ## Syntax Rules: 
 
-  Single Line Comments:  **    
+| Feature              | Syntax                 |
+|----------------------|------------------------|
+| Single Line Comments | **                     |
+| Multi-line comments  | / /                    |
+| Single Commands      | \|                     |
+| Blocks of Code       | :| \|:                 |
+| Assignment Operator  | =                      |
+| Not                  | not                    |
+| Or                   | or                     |
+| And                  | and                    |
+| True                 | T:                     |
+| False                | F:                     |
+| Less than            | <                      |
+| Greater than         | >                      |
+| Less than or equal to| <=                     |
+| Greater than or equal to | >=                |
+| Binary Operators     | + - * /                |
+| Variables            | set = #project         |
+| Classes              | group #classname :| \|:|
+| Functions            | def #function_name :| \|:|
+| Arrays               | set #name = { }        |
 
-  Multi-line comments:  */    /*
-
-  Single Commands: |
-
-  Blocks of Code: :|   |:
-
-  Assignment Operator:  =
-
-  Not: not
-
-  Or: or
-
-  And: and
-
-  True: T:
-
-  False: F:
-
-  Less than:  <
-
-  Greater than: >
-
-  Less than or equal to: <=
-
-  Greater than or equal to: >=
-
-  Binary Operators:  +  -  *  /  
-
-  Variables: set = #project
-
-  Classes: group #classname :|  |:
-
-  Functions: def #function_name :|   |:
-
-  Arrays: set #name = {  } 
 
 ## Grammar Statements:
 
