@@ -8,17 +8,17 @@ Language Overview: This language is built on top of JS and is a general-purpose 
 
 ## Sample Code: 
 
-`** This is a single comment **
+`** This is a single comment **`
 
 `*/ This is
    a multi-line
    comment /*`
 
-`termite.log("Hello, world!")|
+`termite.log("Hello, world!")|`
 
-`set #project = "CodeNetLang"|
+`set #project = "CodeNetLang"|`
 
-`set #array = {1, 2, 3}|
+`set #array = {1, 2, 3}|`
 
 `def #add(a,b) :| 
 	Return a + b|
