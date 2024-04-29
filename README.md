@@ -33,7 +33,7 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 
 1) Create a separate folder with the CodenetLang Interpreter, and CodenetLang files
 2) Open cmd and change directory to your CodenetLang Folder
-3) Enter node int.js
+3) Enter node main.js
 4) Once asked for a file name, enter the name of the desired .cnet file
 
 ## Syntax Rules: 
