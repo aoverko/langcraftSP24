@@ -42,7 +42,7 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 | Feature              | Syntax                 |
 |----------------------|------------------------|
 | Single Line Comments | **                     |
-| Multi-line comments  | */ /*                  |
+| Multi-line comments  | \*\/ \/*                  |
 | Single Commands      | \|                     |
 | Blocks of Code       | :\| \|:                 |
 | Assignment Operator  | =                      |
