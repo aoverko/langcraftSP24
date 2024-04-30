@@ -63,15 +63,16 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 
 
 ## Grammar Statements:
-VAR EQUALS FLOAT;  
-VAR EQUALS NUM OP NUM;  
-VAR EQUALS STRING;  
-VAR EQUALS STRING OP STRING;  
-VAR EQUALS BOOLEAN OP BOOLEAN;  
-VAR EQUALS BOOLEAN;  
-VAR EQUALS FUNCTION;  
-VARIABLE EQUALS ARRAY[NUMBER,NUMBER,NUMBER][NUMBER];  
+| Variable Definition     | SET VAR EQUALS NUM|STRING|BOOL|FUNC |
+| Function Definition     | DEF FUNC PARAMS BODY |
+| Array Definition        | SET ARRAY VALUES     |
+| Class Definition        | GROUP CLASS BODY     |
+| Saved Operations*       | VAR EQUALS NUM OP NUM |
+| Return Information      | RETURN VAR|NUM OP NUM |
+| Write to Terminal       | TERMITE.LOG( MESSAGE ) |
+| Multi-line Comment      | */ COMMENT /*        |
 
+*Variable must have been previously defined
 
 
 ## State of the Language:
