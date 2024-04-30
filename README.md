@@ -63,6 +63,15 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 
 
 ## Grammar Statements:
+VAR EQUALS FLOAT;
+VAR EQUALS NUM OP NUM;
+VAR EQUALS STRING;
+VAR EQUALS STRING OP STRING;
+VAR EQUALS BOOLEAN OP BOOLEAN;
+VAR EQUALS BOOLEAN;
+VAR EQUALS FUNCTION;
+VARIABLE EQUALS ARRAY[NUMBER,NUMBER,NUMBER][NUMBER];
+
 
 
 ## State of the Language:
