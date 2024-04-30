@@ -70,7 +70,7 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 | Array Definition       | `SET ARRAY VALUES`        |
 | Class Definition       | `GROUP CLASS BODY`        |
 | Saved Operations*      | `VAR EQUALS NUM OP NUM`   |
-| Return Information     | `RETURN VAR` \| `NUM OP NUM` |
+| Return Information     | `RETURN VAR` \| `STRING` \| `NUM` \| `NUM OP NUM` |
 | Write to Terminal      | `TERMITE.LOG( MESSAGE )`  |
 | Multi-line Comment     | `*/ COMMENT /*`           |
 
