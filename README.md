@@ -42,9 +42,9 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 | Feature              | Syntax                 |
 |----------------------|------------------------|
 | Single Line Comments | **                     |
-| Multi-line comments  | / /                    |
+| Multi-line comments  | */ /*                  |
 | Single Commands      | \|                     |
-| Blocks of Code       | :| \|:                 |
+| Blocks of Code       | :\| \|:                 |
 | Assignment Operator  | =                      |
 | Not                  | not                    |
 | Or                   | or                     |
@@ -57,8 +57,8 @@ Download Node.js here: [download](https://nodejs.org/en/download)
 | Greater than or equal to | >=                |
 | Binary Operators     | + - * /                |
 | Variables            | set = #project         |
-| Classes              | group #classname :| \|:|
-| Functions            | def #function_name :| \|:|
+| Classes              | group #classname :\| \|:|
+| Functions            | def #function_name :\| \|:|
 | Arrays               | set #name = { }        |
 
 
